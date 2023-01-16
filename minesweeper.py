@@ -16,10 +16,7 @@ class Minesweeper:
         self.mines = mines
         self.board = [[Cell(i, j, 0) for j in range(columns)] for i in range(rows)]
         self.place_mines()
-        for i in range(self.rows):
-            for j in range(self.columns):
-                if self.board[i][j].value == -1:
-                    self.calculate_neighbors(i, j)
+        self.calculate_neighbors()
         self.running = True
         self.game_over = False
         self.game_won = False
@@ -44,18 +41,16 @@ class Minesweeper:
                 if self.board[i][j].value != -1:
                     self.board[i][j].value += 1
 
-    def calculate_neighbors(self, x, y):
-        if x < 0 or x >= self.rows or y < 0 or y >= self.columns or self.board[x][y].value != -1:
-            return
-        self.board[x][y].value = 0
-        for i in range(x-1, x+2):
-            for j in range(y-1, y+2):
-                if i < 0 or i >= self.rows or j < 0 or j >= self.columns:
-                    continue
-                if self.board[i][j].value != -1:
-                    self.board[i][j].value += 1
-                else:
-                    self.calculate_neighbors(i, j)
+    def calculate_neighbors(self):
+        for i in range(self.rows):
+            for j in range(self.columns):
+                if self.board[i][j].value == -1:
+                    for x in range(i-1, i+2):
+                        for y in range(j-1, j+2):
+                            if x < 0 or x >= self.rows or y < 0 or y >= self.columns:
+                                continue
+                            if self.board[x][y].value != -1:
+                                self.board[x][y].value += 1
 
     def open_empty_cells(self, x, y):
         if self.board[x][y].is_opened or self.board[x][y].is_flagged:
@@ -97,6 +92,7 @@ if __name__ == '__main__':
     pygame.display.set_caption("Minesweeper")
     game = Minesweeper(10, 10, 10)
     while game.running:
+        game.render()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game.running = False
@@ -106,6 +102,7 @@ if __name__ == '__main__':
                 y = y // 60
                 if event.button == 1:
                     if game.board[x][y].value == -1:
+                        game.open_empty_cells(x, y)
                         game.game_over = True
                     else:
                         game.open_empty_cells(x, y)
