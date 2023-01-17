@@ -14,6 +14,7 @@ class Minesweeper:
         self.rows = rows
         self.columns = columns
         self.mines = mines
+        self.mines_remaining = self.mines
         self.board = [[Cell(i, j, 0) for j in range(columns)] for i in range(rows)]
         self.place_mines()
         self.calculate_neighbors()
@@ -25,21 +26,11 @@ class Minesweeper:
         self.font_gamewon = pygame.font.Font(None, 72)
                     
     def place_mines(self):
-        mines_remaining = self.mines
-        while mines_remaining > 0:
+        while self.mines_remaining != 0:
             x, y = random.randint(0, self.rows-1), random.randint(0, self.columns-1)
             if self.board[x][y].value != -1:
                 self.board[x][y].value = -1
-                mines_remaining -= 1
-                self.increment_neighbors(x, y)
-
-    def increment_neighbors(self, x, y):
-        for i in range(x-1, x+2):
-            for j in range(y-1, y+2):
-                if i < 0 or i >= self.rows or j < 0 or j >= self.columns:
-                    continue
-                if self.board[i][j].value != -1:
-                    self.board[i][j].value += 1
+                self.mines_remaining -= 1
 
     def calculate_neighbors(self):
         for i in range(self.rows):
@@ -88,9 +79,9 @@ class Minesweeper:
 
 if __name__ == '__main__':
     pygame.init()
-    screen = pygame.display.set_mode((600, 600))
+    screen = pygame.display.set_mode((650, 650))
     pygame.display.set_caption("Minesweeper")
-    game = Minesweeper(10, 10, 10)
+    game = Minesweeper(20, 20, 15)
     while game.running:
         game.render()
         for event in pygame.event.get():
@@ -100,13 +91,13 @@ if __name__ == '__main__':
                 x, y = event.pos
                 x = x // 60
                 y = y // 60
-                if event.button == 1:
+                if event.button == 1 and game.game_over != True:
                     if game.board[x][y].value == -1:
                         game.open_empty_cells(x, y)
                         game.game_over = True
                     else:
                         game.open_empty_cells(x, y)
-                elif event.button == 3:
+                elif event.button == 3 and game.game_over != True:
                     game.board[x][y].is_flagged = not game.board[x][y].is_flagged
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
