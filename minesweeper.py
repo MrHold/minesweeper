@@ -24,6 +24,7 @@ class Minesweeper:
         self.font = pygame.font.Font(None, 36)
         self.font_gameover = pygame.font.Font(None, 72)
         self.font_gamewon = pygame.font.Font(None, 72)
+        self.mines_to_win = 999
                     
     def place_mines(self):
         while self.mines_remaining != 0:
@@ -53,35 +54,73 @@ class Minesweeper:
                     if i < 0 or i >= self.rows or j < 0 or j >= self.columns:
                         continue
                     self.open_empty_cells(i, j)
+
+    def draw_text(self, x, y, string, color, font):
+        font = font
+        text = font.render(string, 1, color)
+        text_rect = text.get_rect()
+        text_rect.center = (x, y)
+        screen.blit(text, text_rect)
+
+    def check_win(self):
+        mines_to_w = 0
+        for i in range(self.rows):
+            for j in range(self.columns):
+                if self.board[i][j].value == -1 and not self.board[i][j].is_flagged:
+                    mines_to_w += 1
+        if mines_to_w == 0:
+            self.game_won = True
                     
+    
     def render(self):
         screen.fill((255, 255, 255))
         for i in range(self.rows):
             for j in range(self.columns):
                 if self.board[i][j].is_opened:
                     if self.board[i][j].value == -1:
-                        pygame.draw.rect(screen, (255, 0, 0), (i*60, j*60, 60, 60))
+                        pygame.draw.rect(screen, (255, 0, 0), (i*60, j*60, 60, 60), 100)
                     else:
-                        pygame.draw.rect(screen, (200, 200, 200), (i*60, j*60, 60, 60))
+                        pygame.draw.rect(screen, (200, 200, 200), (i*60, j*60, 60, 60), 1)
                         if self.board[i][j].value > 0:
                             text = self.font.render(str(self.board[i][j].value), 1, (0, 0, 0))
                             screen.blit(text, (i*60+20, j*60+20))
+                        elif self.board[i][j].is_flagged:
+                            pygame.draw.rect(screen, (0, 0, 255), (i*60, j*60, 60, 60), 100)
                 else:
                     if self.board[i][j].is_flagged:
-                        pygame.draw.rect(screen, (0, 0, 255), (i*60, j*60, 60, 60))
+                        pygame.draw.rect(screen, (0, 0, 255), (i*60, j*60, 60, 60), 100)
                     else:
-                        pygame.draw.rect(screen, (255, 255, 255), (i*60, j*60, 60, 60))
+                        pygame.draw.rect(screen, (180, 180, 180), (i*60, j*60, 60, 60), 100)
         if self.game_over:
-            text = self.font_gameover.render("Game Over", 1, (255, 0, 0))
-            text_rect = text.get_rect(center=(screen.get_width()/2, screen.get_height()/2))
-            screen.blit(text, text_rect)
+            self.draw_text((screen.get_width()/2)+1, (screen.get_height()/2)-1, "Game Over", 'black', self.font_gameover)
+            self.draw_text((screen.get_width()/2)+1, (screen.get_height()/2)-1, "Game Over", 'black', self.font_gameover)
+            self.draw_text((screen.get_width()/2)-1, (screen.get_height()/2)+1, "Game Over", 'black', self.font_gameover)
+            self.draw_text((screen.get_width()/2)-1, (screen.get_height()/2)+1, "Game Over", 'black', self.font_gameover)
+            self.draw_text((screen.get_width()/2), (screen.get_height()/2), "Game Over", 'red', self.font_gameover)
+            self.draw_text((screen.get_width()/2)+1, (screen.get_height()/2)+49, "To restart press R", 'black', self.font_gameover)
+            self.draw_text((screen.get_width()/2)+1, (screen.get_height()/2)+49, "To restart press R", 'black', self.font_gameover)
+            self.draw_text((screen.get_width()/2)-1, (screen.get_height()/2)+51, "To restart press R", 'black', self.font_gameover)
+            self.draw_text((screen.get_width()/2)-1, (screen.get_height()/2)+51, "To restart press R", 'black', self.font_gameover)
+            self.draw_text((screen.get_width()/2), (screen.get_height()/2)+50, "To restart press R", 'red', self.font_gameover)
+        if self.game_won:
+            self.draw_text((screen.get_width()/2)+1, (screen.get_height()/2)-1, "You're won!", 'black', self.font_gameover)
+            self.draw_text((screen.get_width()/2)+1, (screen.get_height()/2)-1, "You're won!", 'black', self.font_gameover)
+            self.draw_text((screen.get_width()/2)-1, (screen.get_height()/2)+1, "You're won!", 'black', self.font_gameover)
+            self.draw_text((screen.get_width()/2)-1, (screen.get_height()/2)+1, "You're won!", 'black', self.font_gameover)
+            self.draw_text((screen.get_width()/2), (screen.get_height()/2), "You're won!", 'red', self.font_gameover)
+            self.draw_text((screen.get_width()/2)+1, (screen.get_height()/2)+49, "To restart press R", 'black', self.font_gameover)
+            self.draw_text((screen.get_width()/2)+1, (screen.get_height()/2)+49, "To restart press R", 'black', self.font_gameover)
+            self.draw_text((screen.get_width()/2)-1, (screen.get_height()/2)+51, "To restart press R", 'black', self.font_gameover)
+            self.draw_text((screen.get_width()/2)-1, (screen.get_height()/2)+51, "To restart press R", 'black', self.font_gameover)
+            self.draw_text((screen.get_width()/2), (screen.get_height()/2)+50, "To restart press R", 'red', self.font_gameover)
         pygame.display.flip()
 
 if __name__ == '__main__':
     pygame.init()
-    screen = pygame.display.set_mode((650, 650))
+    screen = pygame.display.set_mode((600, 600))
+    screen.fill((0, 0, 0))
     pygame.display.set_caption("Minesweeper")
-    game = Minesweeper(20, 20, 15)
+    game = Minesweeper(10, 10, 15)
     while game.running:
         game.render()
         for event in pygame.event.get():
@@ -91,17 +130,19 @@ if __name__ == '__main__':
                 x, y = event.pos
                 x = x // 60
                 y = y // 60
-                if event.button == 1 and game.game_over != True:
-                    if game.board[x][y].value == -1:
+                if event.button == 1 and not game.game_over and not game.game_won:
+                    if game.board[x][y].value == -1 and not game.board[x][y].is_flagged:
                         game.open_empty_cells(x, y)
                         game.game_over = True
                     else:
                         game.open_empty_cells(x, y)
-                elif event.button == 3 and game.game_over != True:
+                elif event.button == 3 and not game.game_over and not game.game_won:
                     game.board[x][y].is_flagged = not game.board[x][y].is_flagged
+                    game.check_win()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
                     game.game_over = False
                     game.__init__(game.rows, game.columns, game.mines)
+            game.check_win()
         game.render()
     pygame.quit()
